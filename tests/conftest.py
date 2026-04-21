@@ -2,6 +2,8 @@ import socket
 import subprocess
 import time
 import logging
+import os
+import sys
 from typing import Generator, Dict, List
 from contextlib import contextmanager
 
@@ -11,6 +13,10 @@ from faker import Faker
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from playwright.sync_api import sync_playwright, Browser, Page
+
+# Use a local SQLite database by default during tests so pytest does not
+# depend on an external PostgreSQL service being available.
+os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
 
 from app.database import Base, get_engine, get_sessionmaker
 from app.models.user import User
@@ -96,7 +102,7 @@ def setup_test_database(request):
     try:
         Base.metadata.drop_all(bind=test_engine)
         Base.metadata.create_all(bind=test_engine)
-        init_db()
+        init_db(bind_engine=test_engine)
         logger.info("Test database initialized.")
     except Exception as e:
         logger.error(f"Error setting up test database: {str(e)}")
@@ -106,7 +112,7 @@ def setup_test_database(request):
 
     if not request.config.getoption("--preserve-db"):
         logger.info("Dropping test database tables...")
-        drop_db()
+        drop_db(bind_engine=test_engine)
 
 @pytest.fixture
 def db_session() -> Generator[Session, None, None]:
@@ -186,7 +192,7 @@ def fastapi_server():
     logger.info(f"Starting FastAPI server on port {base_port}...")
 
     process = subprocess.Popen(
-        ['uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', str(base_port)],
+        [sys.executable, '-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', str(base_port)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,

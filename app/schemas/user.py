@@ -58,8 +58,6 @@ class UserCreate(UserBase):
     def validate_password_strength(self) -> "UserCreate":
         """Validate password strength requirements"""
         password = self.password
-        if len(password) < 8:
-            raise ValueError("Password must be at least 8 characters long")
         if not any(char.isupper() for char in password):
             raise ValueError("Password must contain at least one uppercase letter")
         if not any(char.islower() for char in password):

@@ -3,6 +3,7 @@ from datetime import datetime, timezone, timedelta
 from uuid import UUID
 from typing import List
 from fastapi import Body, FastAPI, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -28,6 +29,20 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def read_root():
+        return """
+        <!doctype html>
+        <html>
+            <head><title>Calculations API</title></head>
+            <body style=\"font-family: Arial, sans-serif; margin: 2rem;\">
+                <h1>Calculations API is running</h1>
+                <p>Use <a href=\"/docs\">/docs</a> for the interactive API and <a href=\"/health\">/health</a> for health checks.</p>
+            </body>
+        </html>
+        """
 
 # ------------------------------------------------------------------------------
 # Health Endpoint
@@ -233,6 +248,6 @@ def delete_calculation(
 # ------------------------------------------------------------------------------
 # Main Block to Run the Server
 # ------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import uvicorn
     uvicorn.run("app.main:app", host="127.0.0.1", port=8001, log_level="info")

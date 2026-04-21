@@ -2,8 +2,7 @@
 
 import uuid
 from datetime import datetime, timezone, timedelta
-from sqlalchemy import Column, String, Boolean, DateTime, or_
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy import Column, String, Boolean, DateTime, Uuid, or_
 from sqlalchemy.orm import relationship
 from app.core.config import get_settings
 from app.database import Base
@@ -21,7 +20,7 @@ class User(Base):
     __tablename__ = "users"
     
     # Primary key and identifying fields
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, index=True)
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, index=True)
     username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=False, index=True)
     password = Column(String, nullable=False)

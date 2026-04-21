@@ -2,9 +2,8 @@
 from datetime import datetime
 import uuid
 from typing import List
-from sqlalchemy import Column, String, DateTime, ForeignKey, JSON, Float
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, declared_attr
+from sqlalchemy import Column, String, DateTime, ForeignKey, JSON, Float, Uuid
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
 from app.database import Base
 
@@ -18,7 +17,7 @@ class AbstractCalculation:
     @declared_attr
     def id(cls):
         return Column(
-            UUID(as_uuid=True), 
+            Uuid(as_uuid=True), 
             primary_key=True, 
             default=uuid.uuid4,
             nullable=False
@@ -27,7 +26,7 @@ class AbstractCalculation:
     @declared_attr
     def user_id(cls):
         return Column(
-            UUID(as_uuid=True), 
+            Uuid(as_uuid=True), 
             ForeignKey('users.id', ondelete='CASCADE'),
             nullable=False,
             index=True
